@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+
+    <add key="ConnectionString" value="Password=IQ;Persist Security Info=True;User ID=IQ_Container_USER;Initial Catalog=IQ_Cont_23_09_15;Data Source=TNT-ANDY\SQL2008de" />
+    
+  </appSettings>
+</configuration>

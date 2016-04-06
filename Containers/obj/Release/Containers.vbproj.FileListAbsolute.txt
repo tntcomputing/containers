@@ -1,0 +1,11 @@
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\ResolveAssemblyReference.cache
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.About.resources
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.frmBatchIssue.resources
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.frmDialog.resources
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.frmItemReturn.resources
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.Loading.resources
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.MainMenu.resources
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.Resources.resources
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.Startup.resources
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.UserLogin.resources
+C:\Users\tiz_000\Dropbox\VS2008_Dev\Containers\Containers\obj\Release\Containers.vbproj.GenerateResource.Cache
