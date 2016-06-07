@@ -24,8 +24,14 @@ Partial Public Class frmItemReturn
         Me.lblTitle = New System.Windows.Forms.Label
         Me.lblCompanyName = New System.Windows.Forms.Label
         Me.pnlItems = New System.Windows.Forms.Panel
+        Me.btnSaveReturnBatch = New System.Windows.Forms.Button
+        Me.lstItems = New System.Windows.Forms.ListBox
+        Me.lstBatch = New System.Windows.Forms.ListView
+        Me.ColumnID = New System.Windows.Forms.ColumnHeader
+        Me.ColumnCustomer = New System.Windows.Forms.ColumnHeader
+        Me.ColumnLastModified = New System.Windows.Forms.ColumnHeader
         Me.txtTestLog = New System.Windows.Forms.TextBox
-        Me.Label2 = New System.Windows.Forms.Label
+        Me.lblFunction = New System.Windows.Forms.Label
         Me.txtAuid = New System.Windows.Forms.TextBox
         Me.Label1 = New System.Windows.Forms.Label
         Me.pnlMenu = New System.Windows.Forms.Panel
@@ -77,13 +83,59 @@ Partial Public Class frmItemReturn
         '
         'pnlItems
         '
+        Me.pnlItems.Controls.Add(Me.btnSaveReturnBatch)
+        Me.pnlItems.Controls.Add(Me.lstItems)
+        Me.pnlItems.Controls.Add(Me.lstBatch)
         Me.pnlItems.Controls.Add(Me.txtTestLog)
-        Me.pnlItems.Controls.Add(Me.Label2)
+        Me.pnlItems.Controls.Add(Me.lblFunction)
         Me.pnlItems.Controls.Add(Me.txtAuid)
         Me.pnlItems.Controls.Add(Me.Label1)
         Me.pnlItems.Location = New System.Drawing.Point(2, 100)
         Me.pnlItems.Name = "pnlItems"
         Me.pnlItems.Size = New System.Drawing.Size(236, 178)
+        '
+        'btnSaveReturnBatch
+        '
+        Me.btnSaveReturnBatch.Location = New System.Drawing.Point(48, 141)
+        Me.btnSaveReturnBatch.Name = "btnSaveReturnBatch"
+        Me.btnSaveReturnBatch.Size = New System.Drawing.Size(136, 33)
+        Me.btnSaveReturnBatch.TabIndex = 10
+        Me.btnSaveReturnBatch.Text = "Save Return Batch"
+        '
+        'lstItems
+        '
+        Me.lstItems.Location = New System.Drawing.Point(1, 63)
+        Me.lstItems.Name = "lstItems"
+        Me.lstItems.Size = New System.Drawing.Size(230, 72)
+        Me.lstItems.TabIndex = 9
+        '
+        'lstBatch
+        '
+        Me.lstBatch.Columns.Add(Me.ColumnID)
+        Me.lstBatch.Columns.Add(Me.ColumnCustomer)
+        Me.lstBatch.Columns.Add(Me.ColumnLastModified)
+        Me.lstBatch.FullRowSelect = True
+        Me.lstBatch.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
+        Me.lstBatch.Location = New System.Drawing.Point(1, 63)
+        Me.lstBatch.Name = "lstBatch"
+        Me.lstBatch.Size = New System.Drawing.Size(230, 112)
+        Me.lstBatch.TabIndex = 8
+        Me.lstBatch.View = System.Windows.Forms.View.Details
+        '
+        'ColumnID
+        '
+        Me.ColumnID.Text = "ID"
+        Me.ColumnID.Width = 25
+        '
+        'ColumnCustomer
+        '
+        Me.ColumnCustomer.Text = "Customer"
+        Me.ColumnCustomer.Width = 100
+        '
+        'ColumnLastModified
+        '
+        Me.ColumnLastModified.Text = "Last Modified"
+        Me.ColumnLastModified.Width = 100
         '
         'txtTestLog
         '
@@ -93,16 +145,16 @@ Partial Public Class frmItemReturn
         Me.txtTestLog.Size = New System.Drawing.Size(230, 112)
         Me.txtTestLog.TabIndex = 5
         '
-        'Label2
+        'lblFunction
         '
-        Me.Label2.BackColor = System.Drawing.Color.White
-        Me.Label2.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Regular)
-        Me.Label2.ForeColor = System.Drawing.Color.Teal
-        Me.Label2.Location = New System.Drawing.Point(4, 36)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(227, 24)
-        Me.Label2.Text = "Return Questions"
-        Me.Label2.TextAlign = System.Drawing.ContentAlignment.TopCenter
+        Me.lblFunction.BackColor = System.Drawing.Color.White
+        Me.lblFunction.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Regular)
+        Me.lblFunction.ForeColor = System.Drawing.Color.Teal
+        Me.lblFunction.Location = New System.Drawing.Point(4, 36)
+        Me.lblFunction.Name = "lblFunction"
+        Me.lblFunction.Size = New System.Drawing.Size(227, 24)
+        Me.lblFunction.Text = "Return Questions"
+        Me.lblFunction.TextAlign = System.Drawing.ContentAlignment.TopCenter
         '
         'txtAuid
         '
@@ -175,8 +227,14 @@ Partial Public Class frmItemReturn
     Friend WithEvents txtAuid As System.Windows.Forms.TextBox
     Private WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents txtTestLog As System.Windows.Forms.TextBox
-    Private WithEvents Label2 As System.Windows.Forms.Label
+    Private WithEvents lblFunction As System.Windows.Forms.Label
     Friend WithEvents pnlMenu As System.Windows.Forms.Panel
     Friend WithEvents btnContinue As System.Windows.Forms.Button
     Friend WithEvents btnBack As System.Windows.Forms.Button
+    Friend WithEvents lstBatch As System.Windows.Forms.ListView
+    Friend WithEvents ColumnID As System.Windows.Forms.ColumnHeader
+    Friend WithEvents ColumnCustomer As System.Windows.Forms.ColumnHeader
+    Friend WithEvents ColumnLastModified As System.Windows.Forms.ColumnHeader
+    Friend WithEvents lstItems As System.Windows.Forms.ListBox
+    Friend WithEvents btnSaveReturnBatch As System.Windows.Forms.Button
 End Class

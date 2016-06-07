@@ -48,8 +48,8 @@ Partial Public Class frmBatchIssue
         Me.ColumnLastModified = New System.Windows.Forms.ColumnHeader
         Me.Label5 = New System.Windows.Forms.Label
         Me.pnlDispatchDate = New System.Windows.Forms.Panel
-        Me.Label6 = New System.Windows.Forms.Label
         Me.DateTimePicker1 = New System.Windows.Forms.DateTimePicker
+        Me.Label6 = New System.Windows.Forms.Label
         Me.panel1.SuspendLayout()
         Me.pnlSelectLocation.SuspendLayout()
         Me.pnlLocation.SuspendLayout()
@@ -315,6 +315,13 @@ Partial Public Class frmBatchIssue
         Me.pnlDispatchDate.Name = "pnlDispatchDate"
         Me.pnlDispatchDate.Size = New System.Drawing.Size(233, 169)
         '
+        'DateTimePicker1
+        '
+        Me.DateTimePicker1.Location = New System.Drawing.Point(1, 46)
+        Me.DateTimePicker1.Name = "DateTimePicker1"
+        Me.DateTimePicker1.Size = New System.Drawing.Size(226, 22)
+        Me.DateTimePicker1.TabIndex = 2
+        '
         'Label6
         '
         Me.Label6.BackColor = System.Drawing.Color.White
@@ -326,24 +333,17 @@ Partial Public Class frmBatchIssue
         Me.Label6.Text = "Select the Dispatch Date"
         Me.Label6.TextAlign = System.Drawing.ContentAlignment.TopCenter
         '
-        'DateTimePicker1
-        '
-        Me.DateTimePicker1.Location = New System.Drawing.Point(1, 46)
-        Me.DateTimePicker1.Name = "DateTimePicker1"
-        Me.DateTimePicker1.Size = New System.Drawing.Size(226, 22)
-        Me.DateTimePicker1.TabIndex = 2
-        '
         'frmBatchIssue
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(240, 320)
+        Me.Controls.Add(Me.pnlItems)
         Me.Controls.Add(Me.pnlDispatchDate)
         Me.Controls.Add(Me.pnlBatch)
         Me.Controls.Add(Me.pnlSelectLocation)
         Me.Controls.Add(Me.pnlMenu)
         Me.Controls.Add(Me.Panel4)
-        Me.Controls.Add(Me.pnlItems)
         Me.Controls.Add(Me.pnlLocation)
         Me.Controls.Add(Me.panel2)
         Me.Controls.Add(Me.label3)

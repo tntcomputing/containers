@@ -16,17 +16,61 @@
     Dim strQuestionAnswer As String
     Dim strTestLog As String
     Dim strAuditor As String
+    Public BatchReturn As BatchReturn
 
     Public Sub New(ByVal UserID As Int32)
         InitializeComponent()
         m_UserID = UserID
         Dim objUser As New clsUser
         strAuditor = objUser.GetUserFullName(UserID)
+        BatchReturn = New BatchReturn()
+    End Sub
+    Private Sub SetupOpenBatchList(ByVal DT As System.Data.DataTable)
+        Me.txtTestLog.Visible = False
+        Me.lstBatch.Visible = True
+        Me.lstItems.Items.Clear()
+        Me.lblFunction.Text = "Open Return Batches"
+        lstBatch.Items.Clear()
+        Dim r As Data.DataRow
+        For Each r In DT.Rows
+            Dim listViewItem1 = New ListViewItem(r.Item("TMPRCBNUMBER").ToString)
+            Dim listViewSubItem1 = New ListViewItem.ListViewSubItem()
+            Dim listViewSubItem2 = New ListViewItem.ListViewSubItem()
 
+
+            listViewSubItem1.Text = r.Item("LocationID").ToString
+            listViewSubItem2.Text = r.Item("LastModified").ToString
+
+            listViewItem1.SubItems.Add(listViewSubItem1)
+            listViewItem1.SubItems.Add(listViewSubItem2)
+            lstBatch.Items.Add(listViewItem1)
+            Me.btnSaveReturnBatch.Visible = False
+            Me.lstItems.Visible = False
+
+
+        Next
+    End Sub
+    Private Sub SetupScanFrameNoOpenBatches()
+        Me.txtTestLog.Visible = True
+        Me.lstBatch.Visible = False
+        Me.lstBatch.Items.Clear()
+        Me.lstItems.Items.Clear()
+        Me.lstItems.Visible = False
+        Me.btnSaveReturnBatch.Visible = False
+        'Me.lblFunction.Text = "Return Questions"
+        Me.lblFunction.Text = "Items in current return batch"
     End Sub
     Private Sub frmItemReturn_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Dim objEnv As New clsEnvironment
         MaintenanceLocation = objEnv.ReturnEnvironmentSetting("SETUP", "MAINTLOCID", 1)
+        Dim DT As System.Data.DataTable = BatchReturn.getDTOfOpenReturnBatches
+        If DT.Rows.Count > 0 Then
+            'If existing show list of open return batches
+            'else
+            SetupOpenBatchList(DT)
+        Else
+            SetupScanFrameNoOpenBatches()
+        End If
         strProcess = "ITEM"
         Me.txtAuid.Focus()
 
@@ -39,7 +83,21 @@
         Me.Close()
     End Sub
 
-    Private Sub mnuContinue_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub LoadBatchList(ByVal LocationID As String)
+        BatchReturn.LoadTMPReturnBatch(LocationID)
+        If BatchReturn.LocationID <> "" Then
+            'Existing Batch
+            'Load list
+            Me.lstItems.Items.Clear()
+            Dim strAuid As String
+            For Each strAuid In BatchReturn.lstAUID
+                Me.lstItems.Items.Add(GetListBoxString(strAuid))
+            Next
+
+        End If
+        Me.SetupScanFrameOpenBatch(Me.lstItems.Items.Count)
+    End Sub
+    Private Sub btnContinue_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnContinue.Click
         Dim strMessage As String = ""
         Dim AUID As String = Me.txtAuid.Text.Trim(Chr(13))
         Select Case strProcess.ToUpper
@@ -54,6 +112,7 @@
                     Me.txtAuid.Text = ""
                     Exit Sub
                 End If
+                'To be here item exists, isn't scrapped or bonded and is out on issue
                 Dim DH As New DataHandling
                 Dim dtItem As Data.DataTable
 
@@ -62,6 +121,47 @@
                 Dim objMove As New clsMove(m_UserID)
                 objMove.IssueMove = "Move"
                 objMove.ReturnFlag = dtItem.Rows(0).Item("ReturnFlag")
+                'Get the orderNo and current location(customer)
+                Dim Locationid As String = dtItem.Rows(0).Item("CurrentLocation")
+                Dim orderno As String = DH.ExecuteStrScalar("Select orderNo from tblissue_move where datereturned is null and itemid = '" & AUID & "'")
+                If Locationid <> BatchReturn.LocationID Then
+                    'To be here this is a new batch 
+                    If BatchReturn.LocationID <> "" Then
+                        'To be here we have an existing batch
+                        'do we need to save existing batch
+                        Dim dialogResult As DialogResult
+                        Dim defaultButton As System.Windows.Forms.MessageBoxDefaultButton = MessageBoxDefaultButton.Button1
+                        dialogResult = MessageBox.Show("Do you wish to save return batch for Customer: " & BatchReturn.LocationID & " before returning this container belonging to " & Locationid & "?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question, defaultButton)
+                        If dialogResult = Windows.Forms.DialogResult.Yes Then
+
+                            BatchReturn.SaveBatch(m_UserID, Date.Now)
+                            Me.lstItems.Items.Clear()
+                            BatchReturn = New BatchReturn
+                        Else
+                            'Blank batch
+                            Me.lstItems.Items.Clear()
+                            BatchReturn = New BatchReturn
+                        End If
+                    End If
+                    'Does batch exit if so load it
+                    LoadBatchList(Locationid)
+                Else
+
+                End If
+
+                'If currentLocation <> locationid then
+                'If open batch
+                'if message(savebatch)
+                'save batch
+                'else
+                'Close batch
+                'end if
+                'If currentlocation already on batch
+                'Open batch
+                'else
+                'Create new batch
+                'endif
+
                 objMove.ItemReturnToWSLoc(dtItem)
                 GetInspectionType(AUID)
                 IsReturnsProcedureNeeded(AUID)
@@ -70,7 +170,7 @@
                 dtQuestions = GetQuestionsForEquipmentType(objNextTestDue.TestSetID, objNextTestDue.InspectionNo)
                 If dtQuestions.Rows.Count > 0 Then
 
-                    AskQuestions()
+                    AskQuestions(Locationid, orderno)
                 End If
 
 
@@ -224,7 +324,10 @@
 
         
     End Function
-    Private Sub AskQuestions()
+    Private Sub AskQuestions(ByVal LocationID As String, ByVal OrderNo As String)
+        Me.lblFunction.Text = "Return Questions"
+        Me.lstItems.Visible = False
+        Me.btnSaveReturnBatch.Visible = False
         QuestionIndex = 0
         bTestResult = True
 
@@ -315,9 +418,9 @@ AskQuestion:
             Call objtest.EnterNonMaintenanceTest(txtAuid.Text, strAuditor, CLng(strInspectionNo), "", _
                                              "", "", strTestLog, False, m_UserID)
             Call objStatus.SetItemStatus(txtAuid.Text, 1)
-            strProcess = "ITEM"
+            BatchReturn.AddItem(txtAuid.Text, LocationID)
             Me.txtAuid.Text = ""
-            Me.txtTestLog.Text = ""
+            SetupScanFrameOpenBatch(True)
             Exit Sub
 
         End If
@@ -328,10 +431,11 @@ AskQuestion:
             Dim objtest As New clsTest
             Call objtest.EnterNonMaintenanceTest(txtAuid.Text, strAuditor, CLng(strInspectionNo), "", _
                                                  "", "", strTestLog, True, m_UserID)
+            BatchReturn.AddItem(txtAuid.Text, LocationID)
+            Me.lstItems.Items.Add(GetListBoxString(txtAuid.Text))
             objtest = Nothing
-            strProcess = "ITEM"
             Me.txtAuid.Text = ""
-            Me.txtTestLog.Text = ""
+            SetupScanFrameOpenBatch(True)
             Exit Sub
         End If
         GoTo AskQuestion
@@ -339,6 +443,19 @@ AskQuestion:
 
 
     End Sub
+    Private Sub SetupScanFrameOpenBatch(ByVal btnVisible As Boolean)
+        strProcess = "ITEM"
+        ' Me.txtAuid.Text = ""
+        Me.txtTestLog.Text = ""
+        Me.lstItems.Visible = True
+        Me.lstBatch.Visible = False
+        Me.btnSaveReturnBatch.Visible = btnVisible
+    End Sub
+    Private Function GetListBoxString(ByVal auid) As String
+        Dim dh As New DataHandling
+        Dim dt As Data.DataTable = dh.GetDataTable("Select AUID + ': ' + Category2 from tblitem I join tblCategory C on I.CategoryID = C.CategoryID where I.AUID = '" & auid & "'")
+        Return dt.Rows(0)(0)
+    End Function
     Sub HandleFailQuestion(ByVal dr As Data.DataRow)
         strTestLog = strTestLog & vbCrLf & dr.Item("Description") & " " & dr.Item("NEGATIVEANSWER")
         If dr.Item("IfNegativeFailTest") = -1 Then
@@ -389,7 +506,7 @@ AskQuestion:
     
     Private Sub txtAuid_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtAuid.KeyPress
         If e.KeyChar = Chr(13) Then
-            mnuContinue_Click(sender, e)
+            btnContinue_Click(sender, e)
         End If
     End Sub
     Private Function NumericResult(ByVal dAnswer As Double, ByVal NegativeAnswer As String) As Boolean
@@ -491,41 +608,32 @@ AskQuestion:
         Me.Close()
     End Sub
 
-    Private Sub btnContinue_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnContinue.Click
-        Dim strMessage As String = ""
-        Dim AUID As String = Me.txtAuid.Text.Trim(Chr(13))
-        Select Case strProcess.ToUpper
-            Case "ITEM"
-                If DoesAUIDExist(AUID, strMessage) = False Then
-                    MessageBox.Show(strMessage)
-                    Me.txtAuid.Text = ""
-                    Exit Sub
-                End If
-                If CheckAUID(AUID, strMessage) = False Then
-                    MessageBox.Show(strMessage)
-                    Me.txtAuid.Text = ""
-                    Exit Sub
-                End If
-                Dim DH As New DataHandling
-                Dim dtItem As Data.DataTable
+    
+    Private Sub btnSaveReturnBatch_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSaveReturnBatch.Click
+        BatchReturn.SaveBatch(m_UserID, Now())
+        Me.lstItems.Items.Clear()
+        BatchReturn = New BatchReturn
+        Dim DT As System.Data.DataTable = BatchReturn.getDTOfOpenReturnBatches
+        If DT.Rows.Count > 0 Then
+            'If existing show list of open return batches
+            'else
+            SetupOpenBatchList(DT)
+        Else
+            SetupScanFrameNoOpenBatches()
+        End If
 
-                dtItem = DH.GetDataTable("Select * from tblitem where auid='" & AUID & "'")
+    End Sub
 
-                Dim objMove As New clsMove(m_UserID)
-                objMove.IssueMove = "Move"
-                objMove.ReturnFlag = dtItem.Rows(0).Item("ReturnFlag")
-                objMove.ItemReturnToWSLoc(dtItem)
-                GetInspectionType(AUID)
-                IsReturnsProcedureNeeded(AUID)
-                GetInspectionType(AUID)
-
-                dtQuestions = GetQuestionsForEquipmentType(objNextTestDue.TestSetID, objNextTestDue.InspectionNo)
-                If dtQuestions.Rows.Count > 0 Then
-
-                    AskQuestions()
-                End If
-
-
-        End Select
+    Private Sub lstBatch_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstBatch.SelectedIndexChanged
+        If Me.lstBatch.SelectedIndices.Count <= 0 Then
+            Exit Sub
+        End If
+        Dim selNdx = Me.lstBatch.SelectedIndices(0)
+        If selNdx >= 0 Then
+            'label3.Text = lstBatch.Items(selNdx).Text
+            BatchReturn = New BatchReturn(lstBatch.Items(selNdx).Text)
+            LoadBatchList(Me.lstBatch.Items(selNdx).SubItems(0).Text)
+            
+        End If
     End Sub
 End Class

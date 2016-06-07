@@ -14,8 +14,9 @@ Public Class UserLogin
 
         If (Me.lstUsers.Text = String.Empty) Then
             Exit Sub
+
         End If
-        Dim dt As Data.DataTable = dh.GetDataTable("Select count(*) from IQ_LS_User.tblUser where Username = '" & Me.lstUsers.Text.Trim & "' and Password ='" & Me.txtPassword.Text.Trim & "'")
+        Dim dt As Data.DataTable = dh.GetDataTable("Select count(*) from IQ_LS_User.tblUser where Username = '" & Me.lstUsers.Text.Trim & "' and Password = cast(hashbytes('sha1',cast(upper('" & Me.txtPassword.Text.Trim & "') as nvarchar(50))) as nvarchar(50))")
         If dt.Rows(0).Item(0) = 0 Then
             Me.panel_invalid.Visible = True
             Me.txtPassword.Text = ""

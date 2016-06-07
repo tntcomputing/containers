@@ -3,6 +3,7 @@
     Public cFunction As String
     Dim m_UserID As Int32
     Public BatchIssue As BatchIssue
+
     Dim objQuestionSet As clsQuestionSet
     Dim dtQuestions As System.Data.DataTable
     Dim strTesting As String = ""
@@ -22,6 +23,7 @@
         Dim objUser As New clsUser
         strAuditor = objUser.GetUserFullName(UserID)
         BatchIssue = New BatchIssue(UserID)
+
     End Sub
     Private Sub cmdBack_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         cReturnValue = "Abandon"
